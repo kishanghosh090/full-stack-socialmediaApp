@@ -31,7 +31,7 @@ export default function ProfilePage() {
       .catch((err) => {
         console.log(err);
         window.location.href = "/Login";
-        
+
         getMessageError(err.response.data.message);
       });
   }, []);
@@ -60,8 +60,10 @@ export default function ProfilePage() {
             <Image
               alt="Card background"
               className="object-cover rounded-xl"
-              src="https://nextui.org/images/hero-card-complete.jpeg"
+              src={`${data.avatar}`}
               width={270}
+              height={250}
+              classNames="bg-cover"
             />
           </CardBody>
           <CardHeader className="pb-0 pt-2 px-4 flex-col items-center justify-center">
@@ -79,7 +81,7 @@ export default function ProfilePage() {
         {/* activity */}
         <div className="activity pb-[7rem]">
           <h1 className="text-[1.2rem] text-center m-3 font-bold">
-            {data.userName}'s  Activity
+            {data.userName}'s Activity
           </h1>
           <Card className="py-4">
             <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">

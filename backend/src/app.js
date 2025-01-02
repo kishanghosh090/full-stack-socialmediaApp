@@ -38,11 +38,10 @@ app.use((err, req, res, next) => {
       stack: err.stack,
     });
   }
-  console.log(err);
 
   return res
     .status(500)
-    .json(new ApiResponse(500, err.message || "Something went wrong"));
+    .json(new ApiResponse(500,  "Something went wrong"));
 });
 
 export { app };

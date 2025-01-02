@@ -27,7 +27,7 @@ const generateToken = async (userId) => {
 };
 
 // register user And upload profile pic--------
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   try {
     const { fullName, userName, phoneNumber, email, password } = req.body;
 
@@ -37,7 +37,7 @@ const registerUser = async (req, res) => {
         return item?.trim() === "";
       })
     ) {
-      throw new ApiError(400, "All fields are required");
+      return next(new ApiError(400, "All fields are required"));
     }
 
     // is email already exists-------
@@ -45,7 +45,9 @@ const registerUser = async (req, res) => {
       $and: [{ email }, { phoneNumber }],
     });
     if (user) {
-      throw new ApiError(400, "User Phone number or email already exists");
+      return next(
+        new ApiError(400, "User Phone number or email already exists")
+      );
     }
 
     // create user---------
@@ -62,21 +64,22 @@ const registerUser = async (req, res) => {
       .status(201)
       .json(new ApiResponse(201, newUser, "User created successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to create User");
+    return next(new ApiError(500, error.message || "Faild to create User"));
   }
 };
 
 // login user--------------
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
     const { email, phoneNumber, password } = req.body;
 
     // validation is user blank the required fields-------
     if (!password) {
-      throw new ApiError(400, "Password is required");
+      return next(new ApiError(400, "Password is required"));
     }
+
     if (!email && !phoneNumber) {
-      throw new ApiError(400, "Email or phone number is required");
+      return next(new ApiError(400, "Email or phone number is required"));
     }
 
     // is user exists-------
@@ -87,13 +90,13 @@ const loginUser = async (req, res) => {
       ],
     });
     if (!user) {
-      throw new ApiError(400, "User not found");
+      return next(new ApiError(400, "User not found"));
     }
 
     // is password correct-------
     const isPasswordCorrect = await user.isPasswordCorrect(password);
     if (!isPasswordCorrect) {
-      throw new ApiError(400, "Password is incorrect");
+      return next(new ApiError(400, "Password is incorrect"));
     }
 
     // create token---------
@@ -110,16 +113,16 @@ const loginUser = async (req, res) => {
       .cookie("token", token, cookieOptions)
       .json(new ApiResponse(202, user, "User Login successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to Login");
+    return next(new ApiError(500, error.message || "Faild to Login"));
   }
 };
-const uploadProfilePic = async (req, res) => {
+const uploadProfilePic = async (req, res, next) => {
   try {
     // is user logged in-------
     const token = req.cookies?.token;
 
     if (!token) {
-      throw new ApiError(401, "Unauthorized");
+      return next(new ApiError(401, "Unauthorized"));
     }
 
     const decodedToken = await jwt.verify(
@@ -129,17 +132,17 @@ const uploadProfilePic = async (req, res) => {
 
     const user = await User.findById(decodedToken._id);
     if (!user) {
-      throw new ApiError(401, "Invalid Access Token");
+      return next(new ApiError(401, "Invalid Access Token"));
     }
 
     // upload profile pic-----------
     const avatarLocalPath = req.file.path;
     if (!avatarLocalPath) {
-      throw new ApiError(400, "Profile pic is required");
+      return next(new ApiError(400, "Profile pic is required"));
     }
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     if (!avatar) {
-      throw new ApiError(500, "Faild to Upload Profile Pic");
+      return next(new ApiError(500, "Faild to Upload Profile Pic"));
     }
     user.avatar = avatar.url;
 
@@ -150,24 +153,26 @@ const uploadProfilePic = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, user, "Profile pic uploaded successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to Upload Profile Pic");
+    return next(
+      new ApiError(500, error.message || "Faild to Upload Profile Pic")
+    );
   }
 };
 
 // logout user------------
-const logoutUser = async (req, res) => {
+const logoutUser = async (req, res, next) => {
   try {
     // is user logged in-------
     const token = req.cookies?.token;
     if (!token) {
-      throw new ApiError(401, "Unauthorized");
+      return next(new ApiError(401, "Unauthorized"));
     }
     const decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
     // remove token from db and send response
     const user = await User.findById(decodedToken._id);
     if (!user) {
-      throw new ApiError(401, "Invalid Access Token");
+      return next(new ApiError(401, "Invalid Access Token"));
     }
     user.refreshToken = null;
     await user.save({ validateBeforeSave: false });
@@ -183,16 +188,16 @@ const logoutUser = async (req, res) => {
       .clearCookie("token", cookieOptions)
       .json(new ApiResponse(200, user, "User Logout successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to Logout");
+    return next(new ApiError(500, error.message || "Faild to Logout"));
   }
 };
 
 // get UserProfile page((IT'S OUR HOME PAGE))--------
-const getUserProfile = async (req, res) => {
+const getUserProfile = async (req, res, next) => {
   try {
     const user = req.user;
     if (!user) {
-      throw new ApiError(401, "Unauthorized");
+      return next(new ApiError(401, "Unauthorized"));
     }
 
     // find user
@@ -202,18 +207,20 @@ const getUserProfile = async (req, res) => {
     // send response
     res.status(200).json(new ApiResponse(200, userProfile, "User Profile"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to get User Profile");
+    return next(
+      new ApiError(500, error.message || "Faild to get User Profile")
+    );
   }
 };
 
 // forget password EMIL SEND-----
 
-const forgertUserPasswordOTPSend = async (req, res) => {
+const forgertUserPasswordOTPSend = async (req, res, next) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      throw new ApiError(400, "User not found");
+      return next(new ApiError(400, "User not found"));
     }
 
     // generate OTP
@@ -235,12 +242,12 @@ const forgertUserPasswordOTPSend = async (req, res) => {
         )
       );
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to Forget Password");
+    return next(new ApiError(500, error.message || "Faild to Forget Password"));
   }
 };
 
 // forget password OTP VERIFY-----
-const forgetPasswordOTPVerify = async (req, res) => {
+const forgetPasswordOTPVerify = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { OTP } = req.body;
@@ -248,11 +255,11 @@ const forgetPasswordOTPVerify = async (req, res) => {
 
     const user = await User.findById(id);
     if (!user) {
-      throw new ApiError(400, "User not found");
+      return next(new ApiError(400, "User not found"));
     }
 
     if (parseInt(user.OTP) !== parseInt(OTP)) {
-      throw new ApiError(400, "Invalid OTP");
+      return next(new ApiError(400, "Invalid OTP"));
     }
 
     user.OTP = null;
@@ -271,28 +278,28 @@ const forgetPasswordOTPVerify = async (req, res) => {
       .cookie("token", token, cookieOptions)
       .json(new ApiResponse(200, {}, "OTP Verify successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to OTP Verify");
+    return next(new ApiError(500, error.message || "Faild to OTP Verify"));
   }
 };
 
 // /////----------  edit profile --------------------
 
 // edit profile pic-------------------
-const editProfilePic = async (req, res) => {
+const editProfilePic = async (req, res, next) => {
   try {
     const user = req.user;
     if (!user) {
-      throw new ApiError(401, "Unauthorized");
+      return next(new ApiError(401, "Unauthorized"));
     }
     const avatarLocalPath = req.file.path;
     if (!avatarLocalPath) {
-      throw new ApiError(400, "Avatar not found");
+      return next(new ApiError(400, "Avatar not found"));
     }
 
     // upload on cloudinary
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     if (!avatar) {
-      throw new ApiError(500, "Faild to Upload Profile Pic");
+      return next(new ApiError(500, "Faild to Upload Profile Pic"));
     }
     // delete old pic
     await deleteFromCloudinary(user.avatar);
@@ -306,21 +313,23 @@ const editProfilePic = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, newUser, "Profile pic uploaded successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to Edit Profile Pic");
+    return next(
+      new ApiError(500, error.message || "Faild to Edit Profile Pic")
+    );
   }
 };
 
 // edit user name-------------------
-const editUserName = async (req, res) => {
+const editUserName = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { userName } = req.body;
     if (!userName) {
-      throw new ApiError(400, "User name is required");
+      return next(new ApiError(400, "User name is required"));
     }
     const user = await User.findById(userId);
     if (!user) {
-      throw new ApiError(400, "User not found");
+      return next(new ApiError(400, "User not found"));
     }
     user.userName = userName;
     await user.save({ validateBeforeSave: false });
@@ -328,20 +337,20 @@ const editUserName = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, user, "User name updated successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to Edit User Name");
+    return next(new ApiError(500, error.message || "Faild to Edit User Name"));
   }
 };
 // edit full name-------------------
-const editFullName = async (req, res) => {
+const editFullName = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { fullName } = req.body;
     if (!fullName) {
-      throw new ApiError(400, "Full name is required");
+      return next(new ApiError(400, "Full name is required"));
     }
     const user = await User.findById(userId);
     if (!user) {
-      throw new ApiError(400, "User not found");
+      return next(new ApiError(400, "User not found"));
     }
     user.fullName = fullName;
     await user.save({ validateBeforeSave: false });
@@ -349,7 +358,7 @@ const editFullName = async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, user, "User name updated successfully"));
   } catch (error) {
-    throw new ApiError(500, error.message || "Faild to Edit User Name");
+    return next(new ApiError(500, error.message || "Faild to Edit User Name"));
   }
 };
 
