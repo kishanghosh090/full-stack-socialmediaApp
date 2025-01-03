@@ -3,7 +3,9 @@ import BackNavigation from "../BackNavigationBar/BackNavigation";
 import axios from "axios";
 import { getMessageSuccess, getMessageError } from "../../Hooks/popUpMessage";
 import { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 function ForgetPassword() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -52,9 +54,10 @@ function ForgetPassword() {
     axios
       .post("/api/v1/users/forgetPasswordOTPVerify", dataForVerify)
       .then((res) => {
-        console.log(dataForVerify);
+        console.log(res);
         getMessageSuccess("OTP verified successfully");
-        window.location.href = "/";
+        navigate("/", { replace: true });
+        return;
       })
       .catch((err) => {
         console.log(err);

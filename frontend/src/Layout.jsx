@@ -6,7 +6,6 @@ import BottomNav from "./Components/BottomNav/BottomNav";
 function Layout() {
   const location = useLocation();
   const shouldRenderHeader =
-    location.pathname === "/" ||
     location.pathname === "/ViewChat" ||
     location.pathname === "/Friends" ||
     location.pathname === "/ViewPost";

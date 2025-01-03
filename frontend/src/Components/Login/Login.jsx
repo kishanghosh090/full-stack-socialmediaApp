@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getMessageSuccess, getMessageError } from "../../Hooks/popUpMessage";
 import { Toaster } from "react-hot-toast";
 
 function Login() {
+  const navigate = useNavigate();
   const [data, setData] = useState({
     email: "",
     phoneNumber: "",
@@ -35,7 +36,7 @@ function Login() {
         setEmail("");
         setPhoneNumber("");
         setPassword("");
-        window.location.href = "/";
+        navigate("/", { replace: true });
         console.log(res);
         return;
       })

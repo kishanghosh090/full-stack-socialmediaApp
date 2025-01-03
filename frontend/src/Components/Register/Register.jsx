@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { getMessageSuccess, getMessageError } from "../../Hooks/popUpMessage";
 import { Toaster } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 function Register() {
+  const navigate = useNavigate();
   const [data, setData] = useState({
     fullName: "",
     userName: "",
@@ -36,7 +37,7 @@ function Register() {
       const res = await axios.post("api/v1/users/register", data);
       setLoading(false);
       getMessageSuccess("user register successfully");
-      window.location.href = "/Login";
+      navigate("/login", { replace: true });
       console.log(res);
       return;
     } catch (error) {
