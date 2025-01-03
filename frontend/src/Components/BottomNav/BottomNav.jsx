@@ -14,6 +14,7 @@ import {
 import { FaUserFriends } from "react-icons/fa";
 function BottomNav() {
   return (
+    
     <div className="fixed bottom-0 w-full bg-slate-100 p-4 z-50">
       <ul className="flex justify-between items-center">
         <li>
