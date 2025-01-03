@@ -37,6 +37,7 @@ function Login() {
         setPassword("");
         window.location.href = "/";
         console.log(res);
+        return;
       })
       .catch((err) => {
         setLoading(false);

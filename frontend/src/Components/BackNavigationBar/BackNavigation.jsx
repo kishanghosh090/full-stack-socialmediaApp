@@ -2,6 +2,9 @@ import React from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 function BackNavigation(props) {
+ 
+
+
   const navigator = useNavigate();
   const goBack = () => {
     navigator(-1);
@@ -16,7 +19,7 @@ function BackNavigation(props) {
         <FaArrowLeft />
       </span>
       <span>
-        <h2 className="text-left text-slate-700 text-3xl">{props.settins}</h2>
+        <h2 className="text-left text-slate-700 text-2xl">{Object.values(props)}</h2>
       </span>
     </div>
   );

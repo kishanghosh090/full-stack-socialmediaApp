@@ -14,6 +14,7 @@ import Friends from "./Components/Friends/Friends.jsx";
 import ViewPost from "./Components/ViewPost/ViewPost.jsx";
 import CreatePost from "./Components/CreatePost/CreatePost.jsx";
 import Settings from "./Components/Settigs/Settings.jsx";
+import ForgetPassword from "./Components/ForgetPassword/ForgetPassword.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/">
           <Route path="Register" element={<Register />} />
           <Route path="/Login" element={<Login />} />
+          <Route path="/ForgetPassword" element={<ForgetPassword />} />
         </Route>
 
         <Route path="/" element={<Layout />}>
