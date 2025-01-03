@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import BackNavigation from "../BackNavigationBar/BackNavigation";
-
+import axios from "axios";
+import { getMessageSuccess, getMessageError } from "../../Hooks/popUpMessage";
+import { Toaster } from "react-hot-toast";
 function ForgetPassword() {
+  const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -13,23 +16,53 @@ function ForgetPassword() {
   const [emailForVerify, setEmailForVerify] = useState("");
   const [dataForVerify, setDataForVerify] = useState({
     email: "",
-    otp: "",
+    OTP: "",
   });
 
   const getOTP = (e) => {
     e.preventDefault();
-    setIsOpen(true);
-    setEmailForVerify(email);
-    setEmail("");
-    console.log(dataGetOTP);
+    if (!email) {
+      getMessageError("Email is required");
+      return;
+    }
+    setLoading(true);
+    axios
+      .post("/api/v1/users/forgetPasswordOTPSend", dataGetOTP)
+      .then((res) => {
+        console.log(res);
+        getMessageSuccess("OTP sent successfully");
+        setLoading(false);
+        setIsOpen(true);
+        setEmailForVerify(email);
+        setEmail("");
+      })
+      .catch((err) => {
+        setLoading(false);
+        getMessageError(err.response.data.message);
+        return;
+      });
   };
 
   const verifyOTP = (e) => {
     e.preventDefault();
-    console.log(dataForVerify);
+    if (!otp) {
+      getMessageError("OTP is required");
+      return;
+    }
+    axios
+      .post("/api/v1/users/forgetPasswordOTPVerify", dataForVerify)
+      .then((res) => {
+        console.log(dataForVerify);
+        getMessageSuccess("OTP verified successfully");
+        window.location.href = "/";
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   return (
     <div>
+      <Toaster />
       <BackNavigation forgetPassword="Forget Password" />
       <div className="mt-[4rem] px-3">
         <div className="form mt-3 pt-7">
@@ -53,10 +86,34 @@ function ForgetPassword() {
             </div>
             <div className="mb-6">
               <button
-                className="w-full bg-pink-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="w-full bg-pink-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center justify-center"
                 type="submit"
               >
-                Send Reset Link
+                <span className="mr-2">Send Reset Link</span>
+                <span>
+                  {loading && (
+                    <svg
+                      className="animate-spin h-5 w-5 text-current"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  )}
+                </span>
               </button>
             </div>
           </form>
@@ -81,7 +138,7 @@ function ForgetPassword() {
                   setDataForVerify({
                     ...dataForVerify,
                     email: emailForVerify,
-                    otp: e.target.value,
+                    OTP: e.target.value,
                   });
                 }}
               />

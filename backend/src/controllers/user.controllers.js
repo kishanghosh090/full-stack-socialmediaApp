@@ -249,11 +249,12 @@ const forgertUserPasswordOTPSend = async (req, res, next) => {
 // forget password OTP VERIFY-----
 const forgetPasswordOTPVerify = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { OTP } = req.body;
-    console.log(id, OTP);
+    const { email, OTP } = req.body;
+    console.log(email, OTP);
 
-    const user = await User.findById(id);
+    const user = await User.findOne({ email });
+    console.log(user);
+    
     if (!user) {
       return next(new ApiError(400, "User not found"));
     }
@@ -361,7 +362,6 @@ const editFullName = async (req, res, next) => {
     return next(new ApiError(500, error.message || "Faild to Edit User Name"));
   }
 };
-
 
 // export controllers--------------------------------------------
 export {

@@ -35,7 +35,7 @@ router.route("/profilePic").post(upload.single("avatar"), uploadProfilePic);
 router.route("/forgetPasswordOTPSend").post(forgertUserPasswordOTPSend);
 
 // user forget password OTP verify route
-router.route("/forgetPasswordOTPVerify/:id").post(forgetPasswordOTPVerify);
+router.route("/forgetPasswordOTPVerify").post(forgetPasswordOTPVerify);
 
 // /////----------  edit profile --------------------
 
