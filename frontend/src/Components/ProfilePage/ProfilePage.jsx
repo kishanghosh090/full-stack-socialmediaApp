@@ -29,10 +29,8 @@ export default function ProfilePage() {
         setData(res.data.data);
       })
       .catch((err) => {
-        console.log(err);
         window.location.href = "/Login";
-
-        getMessageError(err.response.data.message);
+        getMessageError(err?.response?.data.message);
       });
   }, []);
 

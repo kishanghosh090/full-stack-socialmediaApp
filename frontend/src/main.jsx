@@ -13,6 +13,7 @@ import ViewChat from "./Components/ViewChat/ViewChat.jsx";
 import Friends from "./Components/Friends/Friends.jsx";
 import ViewPost from "./Components/ViewPost/ViewPost.jsx";
 import CreatePost from "./Components/CreatePost/CreatePost.jsx";
+import Settings from "./Components/Settigs/Settings.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/ViewChat" element={<ViewChat />} />
           <Route path="/Friends" element={<Friends />} />
           <Route path="/ViewPost" element={<ViewPost />} />
+          <Route path="/Settings" element={<Settings />} />
         </Route>
 
         <Route path="/">

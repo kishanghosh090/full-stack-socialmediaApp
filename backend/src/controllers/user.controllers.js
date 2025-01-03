@@ -362,6 +362,7 @@ const editFullName = async (req, res, next) => {
   }
 };
 
+
 // export controllers--------------------------------------------
 export {
   registerUser,

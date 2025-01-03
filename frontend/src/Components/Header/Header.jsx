@@ -10,7 +10,7 @@ import {
   DropdownMenu,
   Avatar,
 } from "@nextui-org/react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { CiCirclePlus } from "react-icons/ci";
 import axios from "axios";
 export default function Header(data) {
@@ -64,7 +64,7 @@ export default function Header(data) {
                 color="secondary"
                 name="Jason Hughes"
                 size="sm"
-                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                src={`${data?.data?.avatar}`}
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" variant="flat">
@@ -74,7 +74,14 @@ export default function Header(data) {
                   {data?.data?.email || "default"}
                 </p>
               </DropdownItem>
-              <DropdownItem key="settings">My Settings</DropdownItem>
+              <DropdownItem
+                key="settings"
+                onClick={() => {
+                  window.location.href = "/Settings";
+                }}
+              >
+                My Settings
+              </DropdownItem>
 
               <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                 Log Out
